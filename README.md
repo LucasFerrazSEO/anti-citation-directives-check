@@ -1,48 +1,64 @@
-# anti-citation-directives-check — ferramenta grátis e de código aberto para achar diretiva que bloqueia citação
+**English** · [Português (Brasil)](README.pt-BR.md)
 
-`anti-citation-directives-check` é uma ferramenta gratuita e de código
-aberto que varre um HTML atrás de diretivas que bloqueiam citação e
-snippet, e que às vezes acabam na página sem o dono perceber — herdadas de
-template, plugin de SEO mal configurado, ou copiadas de outro projeto.
+# anti-citation-directives-check
 
-## O problema que ela resolve
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) ![Python 3.9+](https://img.shields.io/badge/python-3.9%2B-blue.svg)
 
-`noindex` impede indexação. `nosnippet`, `noarchive`, `max-snippet:0` e
-`data-nosnippet` são diferentes: a página pode continuar indexada e
-aparecendo na busca, só sem trecho citável no resultado — e, por extensão,
-sem o texto disponível para um sistema de IA que respeita essas diretivas
-usar como passagem de resposta. É um jeito silencioso de sabotar a própria
-citabilidade sem perceber.
+`anti-citation-directives-check` is a free, open source tool that scans an
+HTML file for directives that block citation and snippets. These
+directives sometimes end up on a page without the owner noticing,
+inherited from a template, a misconfigured SEO plugin, or copied from
+another project. It runs locally and makes no HTTP requests.
 
-## O que a ferramenta verifica
+## Contents
 
-1. `<meta name="robots">` (e as variantes `googlebot`, `bingbot`) com
-   `nosnippet`, `noarchive`, `noimageindex` ou `max-snippet:N`.
-2. O atributo `data-nosnippet` em qualquer elemento do corpo, que marca um
-   trecho específico como não-citável mesmo com o resto da página
-   liberada.
-3. Opcionalmente, um header HTTP `X-Robots-Tag` que você já tenha em mãos.
+- [Background](#background)
+- [What it checks](#what-it-checks)
+- [Installation](#installation)
+- [Usage](#usage)
+- [FAQ](#faq)
+- [Limitations](#limitations)
+- [Contributing](#contributing)
+- [Author](#author)
+- [License](#license)
 
-## Instalação
+## Background
 
-Só biblioteca padrão do Python (3.9 ou mais recente). Sem dependência
-externa.
+`noindex` blocks indexing. `nosnippet`, `noarchive`, `max-snippet:0` and
+`data-nosnippet` are different: the page can stay indexed and keep showing
+up in search, just without a quotable snippet in the result. By
+extension, the text is also unavailable as an answer passage for an AI
+system that honors these directives. It is a silent way to undermine your
+own citability without noticing.
+
+## What it checks
+
+1. `<meta name="robots">` (and the `googlebot` and `bingbot` variants)
+   with `nosnippet`, `noarchive`, `noimageindex` or `max-snippet:N`.
+2. The `data-nosnippet` attribute on any element in the body, which marks
+   a specific passage as not quotable even when the rest of the page is
+   open.
+3. Optionally, an `X-Robots-Tag` HTTP header value you already have.
+
+## Installation
+
+Python 3.9 or newer, standard library only. No external dependencies.
 
 ```bash
-git clone https://github.com/lucasferrazseo/anti-citation-directives-check.git
+git clone https://github.com/LucasFerrazSEO/anti-citation-directives-check.git
 cd anti-citation-directives-check
 ```
 
-## Como usar, passo a passo
+## Usage
 
-**1. Rode contra o HTML da página.**
+**1. Run it against the page HTML.**
 
 ```bash
 python anti_citation_directives_check.py pagina.html
 ```
 
-**2. Leia o relatório.** Exemplo real, de uma página com três diretivas
-diferentes:
+**2. Read the report.** Real output from a page with three different
+directives. The tool prints its report in Brazilian Portuguese.
 
 ```
 === anti-citation-directives-check: pagina-nosnippet.html ===
@@ -53,42 +69,46 @@ diferentes:
 (Presença da diretiva, não confirmação de que todo provedor de IA a respeita.)
 ```
 
-**3. Confira também o header HTTP**, se você já tiver capturado o
-`X-Robots-Tag` de uma resposta (por exemplo, com `curl -I`):
+**3. Also check the HTTP header** if you have already captured the
+`X-Robots-Tag` from a response (for example with `curl -I`):
 
 ```bash
 curl -sI https://exemplo.com/pagina/ | grep -i x-robots-tag
 python anti_citation_directives_check.py pagina.html --header "noindex, max-snippet:0"
 ```
 
-**4. Página sem nenhuma diretiva** retorna direto "nenhuma diretiva
-encontrada" e código de saída 0 — útil para checagem em lote via script.
+**4. A page with no directives** prints "Nenhuma diretiva anti-citação
+encontrada." and exits with code 0 (code 1 when a directive is found),
+which is useful for batch checks in a script.
 
-## Perguntas frequentes
+## FAQ
 
-**anti-citation-directives-check é realmente grátis?**
-Sim, código aberto sob licença MIT.
+**Is anti-citation-directives-check really free?**
+Yes. It is open source under the MIT license.
 
-**Encontrar `nosnippet` significa que o site fez algo errado?**
-Não necessariamente — às vezes a diretiva está ali de propósito (conteúdo
-sensível, página que não deveria aparecer como trecho citável). A
-ferramenta aponta a presença, a decisão de manter ou remover é sua.
+**Does finding `nosnippet` mean the site did something wrong?**
+Not necessarily. Sometimes the directive is there on purpose (sensitive
+content, a page that should not appear as a quotable snippet). The tool
+points out that it is there; the decision to keep or remove it is yours.
 
-**A ferramenta confirma que o Google ou uma IA respeitou a diretiva?**
-Não. Aponta o que está declarado no HTML; cada provedor documenta
-separadamente quais diretivas de fato respeita.
+**Does the tool confirm that Google or an AI honored the directive?**
+No. It reports what is declared in the HTML; each provider documents
+separately which directives it actually honors.
 
-## Limitações
+## Limitations
 
-A ferramenta aponta a presença da diretiva no HTML, não confirma que todo
-provedor de IA de terceiro de fato a respeita — cada um documenta
-separadamente quais tags obedece.
+The tool reports the presence of the directive in the HTML. It does not
+confirm that every third-party AI provider actually honors it; each one
+documents separately which tags it follows.
 
-## Autor
+## Contributing
 
-[Lucas Ferraz](https://lucasferraz.com) — especialista em SEO, criação de
-sites e SEO para IA, fundador da [Lucas Ferraz SEO](https://lucasferrazseo.com).
+Bug reports and suggestions are welcome through [GitHub Issues](https://github.com/LucasFerrazSEO/anti-citation-directives-check/issues).
 
-## Licença
+## Author
 
-MIT — ver [LICENSE](LICENSE).
+[Lucas Ferraz](https://lucasferraz.com) is an SEO, website development and Generative Engine Optimization specialist and the founder of [Lucas Ferraz SEO](https://lucasferrazseo.com).
+
+## License
+
+MIT. See [LICENSE](LICENSE).
